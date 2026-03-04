@@ -5,23 +5,49 @@ from philh_myftp_biz.pc import Path
 
 #=============================================
 
-def install(name: str):
-
-    Page.install[0]['text'] = name
+def confirm(name: str):
 
     dest = Path(f'C:/Program Files/AdobeCrack/{name}')
 
-    Page.install[1]['text'] += dest.path
+    Page.confirm += Widget.Header(name)
+
+    Page.confirm += Widget.Text(f'Installation Path: {dest}')
+
+    Page.confirm += Widget.Button(
+        text = 'Back',
+        onclick = Page.home
+    )
+
+    Page.confirm += Widget.Button(
+        text = 'Confirm',
+        onclick = lambda: install(name, dest)
+    )
+
+    gui.page = Page.confirm
+    
+def install(
+    name: str,
+    dest: Path
+):
+    
+    Page.install += Widget.Header(name)
+    
+    tempfile = temp('adobe_download', 'zip')
+    url = f'https://philh.myftp.biz/Media/Programs/Adobe/{name}.zip'
+
+    Page.install += Widget.Text(f'Downloading ...\n{url=}\n{tempfile=}')
 
     gui.page = Page.install
-    
-    return
-    tempfile = temp('adobe_download', 'zip')
 
     download(
-        url = f'https://philh.myftp.biz/Media/Programs/Adobe/{name}.zip',
+        url = url,
         path = tempfile
     )
+
+    Page.install[-1]['text'] = f'Extracting ...\n{tempfile=}\n{dest=}'
+    gui.page = Page.install
+
+    dest.delete()
 
     zip = ZIP(tempfile)
 
@@ -37,8 +63,7 @@ gui.title = 'Adobe Installer'
 class Page:
 
     home = gui.Page()
-    photoshop = gui.Page()
-    premiere_pro = gui.Page()
+    confirm = gui.Page()
     install = gui.Page()
 
 #=============================================
@@ -48,52 +73,13 @@ Page.home += Widget.Header('Adobe Installer')
 
 Page.home += Widget.Button(
     text = 'Photoshop',
-    onclick = Page.photoshop
+    onclick = lambda: confirm('Photoshop')
 )
 
 Page.home += Widget.Button(
     text = 'Premiere Pro',
-    onclick = Page.premiere_pro
+    onclick = lambda: confirm('Premiere Pro')
 )
-
-#=============================================
-# PAGE: PHOTOSHOP
-
-Page.photoshop += Widget.Header('Photoshop')
-
-Page.photoshop += Widget.Button(
-    text = 'Back',
-    onclick = Page.home
-)
-
-Page.photoshop += Widget.Button(
-    text = 'Install',
-    onclick = lambda: install('Photoshop')
-)
-
-#=============================================
-# PAGE: PREMIERE PRO
-
-Page.premiere_pro += Widget.Header('Premiere Pro')
-
-Page.premiere_pro += Widget.Button(
-    text = 'Back',
-    onclick = Page.home
-)
-
-Page.premiere_pro += Widget.Button(
-    text = 'Install',
-    onclick = lambda: install('Premiere Pro')
-)
-
-#=============================================
-# PAGE: INSTALL
-
-Page.install += Widget.Header()
-
-Page.install += Widget.Text('Installation Path: ')
-
-Page.install += Widget.Text('This may take a while')
 
 #=============================================
 
