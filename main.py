@@ -1,17 +1,28 @@
 from philh_myftp_biz.web import download
+from philh_myftp_biz.file import temp, ZIP
 from philh_myftp_biz.pc import Path, script_dir
 from philh_myftp_biz.gui import GUI
-from philh_myftp_biz.file import YAML
 
 from functools import partial
 
-def install(url:str):
-    
-    gui.clear()
+def install(name: str):
 
-    gui.Button(
-        text = 'Back'
+    gui.page = Page.install
+
+    Page.install[0]['text'] = name
+
+    dest = Path(f'C:/Program Files/AdobeCrack/{name}')
+
+    tempfile = temp('adobe_download', 'zip')
+
+    download(
+        url = f'https://philh.myftp.biz/Media/Programs/Adobe/{name}.zip',
+        path = tempfile
     )
+
+    zip = ZIP(tempfile)
+
+    zip.extractAll(dest)
 
 #=============================================
 # GUI
@@ -25,6 +36,7 @@ class Page:
     home = gui.Page()
     photoshop = gui.Page()
     premiere_pro = gui.Page()
+    install = gui.Page()
 
 #=============================================
 # PAGE: HOME
@@ -47,13 +59,13 @@ Page.home.Button(
 Page.photoshop.Header('Photoshop')
 
 Page.photoshop.Button(
-    text = 'back',
+    text = 'Back',
     page = Page.home
 )
 
 Page.photoshop.Button(
     text = 'Install',
-    func = partial(install, 'https://philh.myftp.biz/Media/Programs/Adobe/Photoshop.zip')
+    func = partial(install, 'Photoshop')
 )
 
 #=============================================
@@ -62,14 +74,23 @@ Page.photoshop.Button(
 Page.premiere_pro.Header('Premiere Pro')
 
 Page.premiere_pro.Button(
-    text = 'back',
+    text = 'Back',
     page = Page.home
 )
 
 Page.premiere_pro.Button(
     text = 'Install',
-    func = partial(install, 'https://philh.myftp.biz/Media/Programs/Adobe/Premiere Pro.zip')
+    func = partial(install, 'Premiere Pro')
 )
+
+#=============================================
+# PAGE: INSTALL
+
+Page.install.Header()
+
+Page.install.Text('Installing')
+
+Page.install.Text('This may take a while')
 
 #=============================================
 
