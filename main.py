@@ -1,18 +1,21 @@
-from philh_myftp_biz.web import download
+from philh_myftp_biz.gui import GUI, Widget
 from philh_myftp_biz.file import temp, ZIP
-from philh_myftp_biz.pc import Path, script_dir
-from philh_myftp_biz.gui import GUI
+from philh_myftp_biz.web import download
+from philh_myftp_biz.pc import Path
 
-from functools import partial
+#=============================================
 
 def install(name: str):
-
-    gui.page = Page.install
 
     Page.install[0]['text'] = name
 
     dest = Path(f'C:/Program Files/AdobeCrack/{name}')
 
+    Page.install[1]['text'] += dest.path
+
+    gui.page = Page.install
+    
+    return
     tempfile = temp('adobe_download', 'zip')
 
     download(
@@ -29,7 +32,7 @@ def install(name: str):
 
 gui = GUI()
 
-gui.title = 'Cracked Adobe Installer'
+gui.title = 'Adobe Installer'
 
 class Page:
 
@@ -41,56 +44,56 @@ class Page:
 #=============================================
 # PAGE: HOME
 
-Page.home.Header('Adobe Installer')
+Page.home += Widget.Header('Adobe Installer')
 
-Page.home.Button(
+Page.home += Widget.Button(
     text = 'Photoshop',
-    page = Page.photoshop
+    onclick = Page.photoshop
 )
 
-Page.home.Button(
+Page.home += Widget.Button(
     text = 'Premiere Pro',
-    page = Page.premiere_pro
+    onclick = Page.premiere_pro
 )
 
 #=============================================
 # PAGE: PHOTOSHOP
 
-Page.photoshop.Header('Photoshop')
+Page.photoshop += Widget.Header('Photoshop')
 
-Page.photoshop.Button(
+Page.photoshop += Widget.Button(
     text = 'Back',
-    page = Page.home
+    onclick = Page.home
 )
 
-Page.photoshop.Button(
+Page.photoshop += Widget.Button(
     text = 'Install',
-    func = partial(install, 'Photoshop')
+    onclick = lambda: install('Photoshop')
 )
 
 #=============================================
 # PAGE: PREMIERE PRO
 
-Page.premiere_pro.Header('Premiere Pro')
+Page.premiere_pro += Widget.Header('Premiere Pro')
 
-Page.premiere_pro.Button(
+Page.premiere_pro += Widget.Button(
     text = 'Back',
-    page = Page.home
+    onclick = Page.home
 )
 
-Page.premiere_pro.Button(
+Page.premiere_pro += Widget.Button(
     text = 'Install',
-    func = partial(install, 'Premiere Pro')
+    onclick = lambda: install('Premiere Pro')
 )
 
 #=============================================
 # PAGE: INSTALL
 
-Page.install.Header()
+Page.install += Widget.Header()
 
-Page.install.Text('Installing')
+Page.install += Widget.Text('Installation Path: ')
 
-Page.install.Text('This may take a while')
+Page.install += Widget.Text('This may take a while')
 
 #=============================================
 
