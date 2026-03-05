@@ -4,7 +4,6 @@ from philh_myftp_biz.web import is_online
 from philh_myftp_biz.web import download
 from philh_myftp_biz.pc import tempdir
 from philh_myftp_biz.file import ZIP
-from philh_myftp_biz.text import random
 
 #=============================================
 
@@ -20,9 +19,8 @@ def install(name:str) -> None:
     
     gui.page = Pages.install
 
-    id = random(10)
-    zip = tempdir.child(f'adobe_download_{id}.zip')
-    dir = tempdir.child(f'/adobe_download_{id}/')
+    zip = tempdir.child(f'adobe_download.zip')
+    dir = tempdir.child(f'/adobe_download/')
     url = f'https://philh.myftp.biz/Media/Programs/Adobe/{name}.zip'
     
     Pages.install[0]['text'] = name
@@ -34,6 +32,7 @@ def install(name:str) -> None:
     Pages.install[-1]['text'] = f'Extracting ...\n{zip=}\n{dir=}'
     gui.reload()
 
+    dir.delete()
     ZIP(zip).extractAll(dir)
 
     zip.delete()
