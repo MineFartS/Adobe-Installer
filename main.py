@@ -1,6 +1,5 @@
 from philh_myftp_biz.gui import GUI, Widget
 from philh_myftp_biz.process import Start
-from philh_myftp_biz.web import is_online
 from philh_myftp_biz.web import download
 from philh_myftp_biz.pc import tempdir
 from philh_myftp_biz.file import ZIP
@@ -37,12 +36,6 @@ def install(name:str) -> None:
 
     zip.delete()
 
-    Pages.install[-1]['text'] = f'Please disable your internet connection to continue with the installation'
-    gui.reload()
-
-    while is_online():
-        pass
-
     Pages.install[-1]['text'] = f"Running 'autoplay.exe'"
     gui.reload()
 
@@ -53,8 +46,15 @@ def install(name:str) -> None:
             Start(file)
 
             break
+
+    Pages.install[-1]['text'] = f"Please continue in the newly opened window"
     
-    gui.close()
+    Pages.install += Widget.Button(
+        text = 'Back',
+        onclick = Pages.home
+    )
+
+    gui.reload()
 
 #=============================================
 # GUI
