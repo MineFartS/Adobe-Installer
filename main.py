@@ -1,57 +1,62 @@
 from philh_myftp_biz.gui import GUI, Widget
-from philh_myftp_biz.file import temp, ZIP
+from philh_myftp_biz.process import Start
+from philh_myftp_biz.web import is_online
 from philh_myftp_biz.web import download
-from philh_myftp_biz.pc import Path
+from philh_myftp_biz.pc import tempdir
+from philh_myftp_biz.file import ZIP
 
 #=============================================
 
-def confirm(name: str):
+def confirm(name:str) -> None:
 
-    dest = Path(f'C:/Program Files/AdobeCrack/{name}')
+    Pages.confirm[0]['text'] = name
 
-    Page.confirm += Widget.Header(name)
+    Pages.confirm[2]['command'] = lambda: install(name)
 
-    Page.confirm += Widget.Text(f'Installation Path: {dest}')
-
-    Page.confirm += Widget.Button(
-        text = 'Back',
-        onclick = Page.home
-    )
-
-    Page.confirm += Widget.Button(
-        text = 'Confirm',
-        onclick = lambda: install(name, dest)
-    )
-
-    gui.page = Page.confirm
+    gui.page = Pages.confirm
     
-def install(
-    name: str,
-    dest: Path
-):
+def install(name:str) -> None:
     
-    Page.install += Widget.Header(name)
-    
-    tempfile = temp('adobe_download', 'zip')
+    gui.page = Pages.install
+
+    zip = tempdir.child('adobe_download.zip')
+    dir = tempdir.child('/adobe_download/')
     url = f'https://philh.myftp.biz/Media/Programs/Adobe/{name}.zip'
+    
+    Pages.install[0]['text'] = name
+    Pages.install[1]['text'] = f'Downloading ...\n{url=}\n{zip=}'
+    gui.reload()
 
-    Page.install += Widget.Text(f'Downloading ...\n{url=}\n{tempfile=}')
+    download(url, zip)
 
-    gui.page = Page.install
+    Pages.install[-1]['text'] = f'Extracting ...\n{zip=}\n{dir=}'
+    gui.reload()
 
-    download(
-        url = url,
-        path = tempfile
-    )
+    dir.delete()
 
-    Page.install[-1]['text'] = f'Extracting ...\n{tempfile=}\n{dest=}'
-    gui.page = Page.install
+    ZIP(zip).extractAll(dir)
 
-    dest.delete()
+    zip.delete()
 
-    zip = ZIP(tempfile)
+    Pages.install[-1]['text'] = f'Please disable your internet connection to continue with the installation'
+    gui.reload()
 
-    zip.extractAll(dest)
+#    while is_online():
+#        pass
+
+    Pages.install[-1]['text'] = f"Running 'autoplay.exe'"
+    gui.reload()
+
+    for file in dir.descendants:
+
+        if file.seg == 'autoplay.exe':
+
+            Pages.install[-1]['text'] = f"Please continue in the new window"
+            gui.reload()
+            
+            Start(file)
+
+            break
 
 #=============================================
 # GUI
@@ -60,7 +65,9 @@ gui = GUI()
 
 gui.title = 'Adobe Installer'
 
-class Page:
+gui.size = (1000, 500)
+
+class Pages:
 
     home = gui.Page()
     confirm = gui.Page()
@@ -69,20 +76,41 @@ class Page:
 #=============================================
 # PAGE: HOME
 
-Page.home += Widget.Header('Adobe Installer')
+Pages.home += Widget.Header('Adobe Installer')
 
-Page.home += Widget.Button(
+Pages.home += Widget.Button(
     text = 'Photoshop',
     onclick = lambda: confirm('Photoshop')
 )
 
-Page.home += Widget.Button(
+Pages.home += Widget.Button(
     text = 'Premiere Pro',
     onclick = lambda: confirm('Premiere Pro')
 )
 
 #=============================================
+# PAGE: CONFIRM
 
-gui.page = Page.home
+Pages.confirm += Widget.Header()
+
+Pages.confirm += Widget.Button(
+    text = 'Back',
+    onclick = Pages.home
+)
+
+Pages.confirm += Widget.Button(
+    text = 'Download'
+)
+
+#=============================================
+# PAGE: INSTALL
+
+Pages.install += Widget.Header()
+
+Pages.install += Widget.Text()
+
+#=============================================
+
+gui.page = Pages.home
 
 gui.run()
