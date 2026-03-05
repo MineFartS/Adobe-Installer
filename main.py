@@ -49,14 +49,13 @@ def install(name:str) -> None:
 
     for file in dir.descendants:
 
-        if file.seg == 'autoplay.exe':
-
-            Pages.install[-1]['text'] = f"Please continue in the new window"
-            gui.reload()
+        if file.seg() == 'autoplay.exe':
             
             Start(file)
 
             break
+    
+    gui.close()
 
 #=============================================
 # GUI
