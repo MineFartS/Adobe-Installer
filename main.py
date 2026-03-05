@@ -41,8 +41,8 @@ def install(name:str) -> None:
     Pages.install[-1]['text'] = f'Please disable your internet connection to continue with the installation'
     gui.reload()
 
-#    while is_online():
-#        pass
+    while is_online():
+        pass
 
     Pages.install[-1]['text'] = f"Running 'autoplay.exe'"
     gui.reload()
